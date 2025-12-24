@@ -1,0 +1,417 @@
+```html
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logic Evaluator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #764ba2;
+            padding-bottom: 10px;
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .toggle-item {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .toggle-item label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 100%;
+            height: 50px;
+            background: #e0e0e0;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #4caf50;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(calc(100% + 10px));
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 2em;
+            font-weight: bold;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 Logic Evaluator</h1>
+
+        <div class="cards">
+            <!-- 1. LOGIN TIZIMI -->
+            <div class="card">
+                <h2>🔐 Login Tizimi (AND)</h2>
+                <div class="toggle-group">
+                    <div class="toggle-item">
+                        <label>Username to'g'ri</label>
+                        <div class="toggle-switch" onclick="toggleSwitch(this, 'login1')">
+                            <div class="toggle-slider">❌</div>
+                        </div>
+                    </div>
+                    <div class="toggle-item">
+                        <label>Password to'g'ri</label>
+                        <div class="toggle-switch" onclick="toggleSwitch(this, 'login2')">
+                            <div class="toggle-slider">❌</div>
+                        </div>
+                    </div>
+                    <div class="toggle-item">
+                        <label>Aktiv</label>
+                        <div class="toggle-switch" onclick="toggleSwitch(this, 'login3')">
+                            <div class="toggle-slider">❌</div>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="loginCheck()">Login Tekshirish</button>
+                <div id="loginResult" class="result"></div>
+                <div id="loginInfo" class="info" style="display: none;"></div>
+            </div>
+
+            <!-- 2. TO'LOV TIZIMI -->
+            <div class="card">
+                <h2>💳 To'lov Tizimi (OR)</h2>
+                <div class="toggle-group">
+                    <div class="toggle-item">
+                        <label>Naqd pul</label>
+                        <div class="toggle-switch" onclick="toggleSwitch(this, 'pay1')">
+                            <div class="toggle-slider">❌</div>
+                        </div>
+                    </div>
+                    <div class="toggle-item">
+                        <label>Karta</label>
+                        <div class="toggle-switch" onclick="toggleSwitch(this, 'pay2')">
+                            <div class="toggle-slider">❌</div>
+                        </div>
+                    </div>
+                    <div class="toggle-item">
+                        <label>Click</label>
+                        <div class="toggle-switch" onclick="toggleSwitch(this, 'pay3')">
+                            <div class="toggle-slider">❌</div>
+                        </div>
+                    </div>
+                    <div class="toggle-item">
+                        <label>Payme</label>
+                        <div class="toggle-switch" onclick="toggleSwitch(this, 'pay4')">
+                            <div class="toggle-slider">❌</div>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="paymentCheck()">To'lov Tekshirish</button>
+                <div id="paymentResult" class="result"></div>
+                <div id="paymentInfo" class="info" style="display: none;"></div>
+            </div>
+
+            <!-- 3. KIRISH HUQUQI -->
+            <div class="card">
+                <h2>👥 Kirish Huquqi (OR + AND)</h2>
+                <div class="toggle-group">
+                    <div class="toggle-item">
+                        <label>Admin</label>
+                        <div class="toggle-switch" onclick="toggleSwitch(this, 'perm1')">
+                            <div class="toggle-slider">❌</div>
+                        </div>
+                    </div>
+                    <div class="toggle-item">
+                        <label>Moderator</label>
+                        <div class="toggle-switch" onclick="toggleSwitch(this, 'perm2')">
+                            <div class="toggle-slider">❌</div>
+                        </div>
+                    </div>
+                    <div class="toggle-item">
+                        <label>Owner</label>
+                        <div class="toggle-switch" onclick="toggleSwitch(this, 'perm3')">
+                            <div class="toggle-slider">❌</div>
+                        </div>
+                    </div>
+                    <div class="toggle-item">
+                        <label>Aktiv</label>
+                        <div class="toggle-switch" onclick="toggleSwitch(this, 'perm4')">
+                            <div class="toggle-slider">❌</div>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="permissionCheck()">Ruxsat Tekshirish</button>
+                <div id="permissionResult" class="result"></div>
+                <div id="permissionInfo" class="info" style="display: none;"></div>
+            </div>
+
+            <!-- 4. IMTIHON NATIJASI -->
+            <div class="card">
+                <h2>📚 Imtihon (AND)</h2>
+                <div class="toggle-group">
+                    <div class="toggle-item">
+                        <label>Yozma (60+)</label>
+                        <div class="toggle-switch" onclick="toggleSwitch(this, 'exam1')">
+                            <div class="toggle-slider">❌</div>
+                        </div>
+                    </div>
+                    <div class="toggle-item">
+                        <label>Og'zaki (60+)</label>
+                        <div class="toggle-switch" onclick="toggleSwitch(this, 'exam2')">
+                            <div class="toggle-slider">❌</div>
+                        </div>
+                    </div>
+                    <div class="toggle-item">
+                        <label>Loyiha (60+)</label>
+                        <div class="toggle-switch" onclick="toggleSwitch(this, 'exam3')">
+                            <div class="toggle-slider">❌</div>
+                        </div>
+                    </div>
+                    <div class="toggle-item">
+                        <label>Davomat (80%+)</label>
+                        <div class="toggle-switch" onclick="toggleSwitch(this, 'exam4')">
+                            <div class="toggle-slider">❌</div>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="examCheck()">Natija Tekshirish</button>
+                <div id="examResult" class="result"></div>
+                <div id="examInfo" class="info" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle state
+        let states = {};
+
+        function toggleSwitch(element, id) {
+            element.classList.toggle('active');
+            const isActive = element.classList.contains('active');
+            element.querySelector('.toggle-slider').textContent = isActive ? '✅' : '❌';
+            states[id] = isActive;
+        }
+
+        // Login
+        function loginCheck() {
+            const user = states['login1'] || false;
+            const pass = states['login2'] || false;
+            const active = states['login3'] || false;
+
+            const success = user && pass && active;
+
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.className = 'result show ' + (success ? 'success' : 'error');
+            resultDiv.textContent = success ? '✅ KIRISH MUVAFFAQIYATLI' : '❌ KIRISH RAD ETILDI';
+
+            const infoDiv = document.getElementById('loginInfo');
+            infoDiv.style.display = 'block';
+            infoDiv.innerHTML = `
+                <div class="info-item"><span>Username:</span><span>${user ? '✅' : '❌'}</span></div>
+                <div class="info-item"><span>Password:</span><span>${pass ? '✅' : '❌'}</span></div>
+                <div class="info-item"><span>Aktiv:</span><span>${active ? '✅' : '❌'}</span></div>
+                <div class="info-item"><span><strong>AND natijasi:</strong></span><span><strong>${success ? '✅ TRUE' : '❌ FALSE'}</strong></span></div>
+            `;
+        }
+
+        // Payment
+        function paymentCheck() {
+            const cash = states['pay1'] || false;
+            const card = states['pay2'] || false;
+            const click = states['pay3'] || false;
+            const payme = states['pay4'] || false;
+
+            const success = cash || card || click || payme;
+
+            const resultDiv = document.getElementById('paymentResult');
+            resultDiv.className = 'result show ' + (success ? 'success' : 'error');
+            resultDiv.textContent = success ? '✅ TO\'LOV MUMKIN' : '❌ TO\'LOV USULI YO\'Q';
+
+            const infoDiv = document.getElementById('paymentInfo');
+            infoDiv.style.display = 'block';
+            infoDiv.innerHTML = `
+                <div class="info-item"><span>Naqd:</span><span>${cash ? '✅' : '❌'}</span></div>
+                <div class="info-item"><span>Karta:</span><span>${card ? '✅' : '❌'}</span></div>
+                <div class="info-item"><span>Click:</span><span>${click ? '✅' : '❌'}</span></div>
+                <div class="info-item"><span>Payme:</span><span>${payme ? '✅' : '❌'}</span></div>
+                <div class="info-item"><span><strong>OR natijasi:</strong></span><span><strong>${success ? '✅ TRUE' : '❌ FALSE'}</strong></span></div>
+            `;
+        }
+
+        // Permission
+        function permissionCheck() {
+            const admin = states['perm1'] || false;
+            const mod = states['perm2'] || false;
+            const owner = states['perm3'] || false;
+            const active = states['perm4'] || false;
+
+            const success = (admin || mod || owner) && active;
+
+            const resultDiv = document.getElementById('permissionResult');
+            resultDiv.className = 'result show ' + (success ? 'success' : 'error');
+            resultDiv.textContent = success ? '✅ RUXSAT BOR' : '❌ RUXSAT YO\'Q';
+
+            const infoDiv = document.getElementById('permissionInfo');
+            infoDiv.style.display = 'block';
+            infoDiv.innerHTML = `
+                <div class="info-item"><span>Admin:</span><span>${admin ? '✅' : '❌'}</span></div>
+                <div class="info-item"><span>Moderator:</span><span>${mod ? '✅' : '❌'}</span></div>
+                <div class="info-item"><span>Owner:</span><span>${owner ? '✅' : '❌'}</span></div>
+                <div class="info-item"><span>Aktiv:</span><span>${active ? '✅' : '❌'}</span></div>
+                <div class="info-item"><span><strong>(A||M||O) && Aktiv:</strong></span><span><strong>${success ? '✅ TRUE' : '❌ FALSE'}</strong></span></div>
+            `;
+        }
+
+        // Exam
+        function examCheck() {
+            const written = states['exam1'] || false;
+            const oral = states['exam2'] || false;
+            const project = states['exam3'] || false;
+            const attendance = states['exam4'] || false;
+
+            const success = written && oral && project && attendance;
+
+            const resultDiv = document.getElementById('examResult');
+            resultDiv.className = 'result show ' + (success ? 'success' : 'error');
+            resultDiv.textContent = success ? '✅ O\'TDINGIZ' : '❌ O\'TMADINGIZ';
+
+            const infoDiv = document.getElementById('examInfo');
+            infoDiv.style.display = 'block';
+            infoDiv.innerHTML = `
+                <div class="info-item"><span>Yozma:</span><span>${written ? '✅' : '❌'}</span></div>
+                <div class="info-item"><span>Og'zaki:</span><span>${oral ? '✅' : '❌'}</span></div>
+                <div class="info-item"><span>Loyiha:</span><span>${project ? '✅' : '❌'}</span></div>
+                <div class="info-item"><span>Davomat:</span><span>${attendance ? '✅' : '❌'}</span></div>
+                <div class="info-item"><span><strong>AND natijasi:</strong></span><span><strong>${success ? '✅ TRUE' : '❌ FALSE'}</strong></span></div>
+            `;
+        }
+
+        console.log("🧠 Logic Evaluator ishga tushdi!");
+    </script>
+</body>
+</html>
+
+```
